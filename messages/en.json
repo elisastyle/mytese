@@ -1,0 +1,8 @@
+{
+    "price": "Price",
+    "real_estate": "Real Estate",
+    "currency_select_label": "Show price in:",
+    "loading": "Loading exchange rates...",
+    "error": "Error fetching exchange rates"
+  }
+  

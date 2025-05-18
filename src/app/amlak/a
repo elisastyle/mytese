@@ -1,0 +1,91 @@
+'use client';
+
+import { useState } from "react";
+
+type Currency = "toman" | "usd" | "eur" | "aed" | "try";
+
+const exchangeRates: Record<Currency, number> = {
+  toman: 1,
+  usd: 0.000021,
+  eur: 0.000019,
+  aed: 0.000077,
+  try: 0.00065,
+};
+
+const properties = [
+  { id: 1, title: "آپارتمان در تهران", price: 30000000 },
+  { id: 2, title: "ویلا در شمال", price: 50000000 },
+  { id: 3, title: "خانه در اصفهان", price: 25000000 },
+];
+
+export default function RentPage() {
+  const [selectedCurrency, setSelectedCurrency] = useState<Record<number, Currency>>({});
+
+  const handleCurrencyChange = (id: number, currency: Currency) => {
+    setSelectedCurrency((prev) => ({
+      ...prev,
+      [id]: currency,
+    }));
+  };
+
+  const convertPrice = (price: number, currency: Currency): string => {
+    const rate = exchangeRates[currency] || 1;
+    const converted = price * rate;
+    return currency === "toman"
+      ? `${price.toLocaleString()} تومان`
+      : `${converted.toFixed(2)} ${currency.toUpperCase()}`;
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-100 p-8">
+      <h1 className="text-3xl font-bold mb-8 text-center text-blue-800">لیست املاک برای اجاره</h1>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {properties.map((property) => {
+          const currency = selectedCurrency[property.id] || "toman";
+          return (
+            <div
+              key={property.id}
+              className="bg-white rounded-xl shadow-lg p-5 flex flex-col justify-between transition hover:shadow-xl"
+            >
+              <div>
+                <h2 className="text-xl font-semibold mb-2 text-gray-800">{property.title}</h2>
+
+                {currency !== "toman" && (
+                  <p className="text-sm text-gray-500 mb-1 line-through">
+                    {property.price.toLocaleString()} تومان
+                  </p>
+                )}
+
+                <p className="text-blue-700 font-medium mb-2">
+                  {convertPrice(property.price, currency)}
+                </p>
+
+                <p className="text-xs text-gray-500 mt-1">
+                  نرخ تبدیل: 1 تومان = {exchangeRates[currency]} {currency.toUpperCase()}
+                </p>
+              </div>
+
+              <div className="mt-4">
+                <label className="block mb-1 text-sm text-gray-500">مشاهده قیمت با ارز:</label>
+                <select
+                  value={currency}
+                  onChange={(e) =>
+                    handleCurrencyChange(property.id, e.target.value as Currency)
+                  }
+                  className="border border-gray-300 rounded px-3 py-2 w-full bg-white"
+                >
+                  <option value="toman">🇮🇷 تومان</option>
+                  <option value="usd">🇺🇸 دلار (USD)</option>
+                  <option value="eur">🇪🇺 یورو (EUR)</option>
+                  <option value="aed">🇦🇪 درهم (AED)</option>
+                  <option value="try">🇹🇷 لیر (TRY)</option>
+                </select>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

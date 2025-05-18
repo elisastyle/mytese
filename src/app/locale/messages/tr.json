@@ -1,0 +1,8 @@
+{
+    "price": "Fiyat",
+    "real_estate": "Emlak",
+    "currency_select_label": "Fiyatı göster:",
+    "loading": "Döviz kuru alınıyor...",
+    "error": "Döviz kuru alınırken hata oluştu"
+  }
+  

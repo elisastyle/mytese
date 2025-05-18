@@ -1,0 +1,98 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+
+interface PriceProps {
+  amount: number;
+}
+
+const Price = ({ amount }: PriceProps) => {
+  const [currency, setCurrency] = useState<"TOMAN" | "USD" | "EUR" | "AED" | "TRY">("TOMAN");
+  const [rates, setRates] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const t = useTranslations("HomePage");
+
+  const API_KEY = "0ae6c1ffb4373ecff36775ad4cb038d0"; // از API واقعی خود استفاده کن
+
+  useEffect(() => {
+    const fetchRates = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("https://api.currencylayer.com/live", {
+          params: {
+            access_key: API_KEY,
+            symbols: "EUR,AED,TRY,IRR",
+          },
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          setRates(data.quotes);
+          setError(null);
+        } else {
+          setError(t("error.fetchingRates"));
+        }
+      } catch (err) {
+        setError(t("error.connection"));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRates();
+  }, []);
+
+  const convertPrice = (price: number) => {
+    if (currency === "TOMAN") {
+      return price.toLocaleString("fa-IR") + " تومان";
+    }
+
+    if (!rates || !rates["USDIRR"]) return t("error.noRate");
+
+    const rial = price * 10; // قیمت‌ها به تومان هستن
+    const usd = rial / rates["USDIRR"]; // تبدیل تومان به دلار
+
+    switch (currency) {
+      case "USD":
+        return usd.toLocaleString("en-US", { style: "currency", currency: "USD" });
+      case "EUR":
+        return (usd * rates["USDEUR"]).toLocaleString("en-US", { style: "currency", currency: "EUR" });
+      case "AED":
+        return (usd * rates["USDAED"]).toLocaleString("en-US", { style: "currency", currency: "AED" });
+      case "TRY":
+        return (usd * rates["USDTRY"]).toLocaleString("en-US", { style: "currency", currency: "TRY" });
+      default:
+        return t("error.unknownCurrency");
+    }
+  };
+
+  return (
+    <div className="price-component">
+      {loading ? (
+        <p>{t("loading")}</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : (
+        <div>
+          <p>{convertPrice(amount)}</p>
+          <select
+            className="currency-select"
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value as any)}
+          >
+            <option value="TOMAN">تومان</option>
+            <option value="USD">دلار</option>
+            <option value="EUR">یورو</option>
+            <option value="AED">درهم</option>
+            <option value="TRY">لیر</option>
+          </select>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Price;
