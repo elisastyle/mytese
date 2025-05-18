@@ -1,7 +1,7 @@
 import { getRequestConfig } from 'next-intl/server';
 
 export default getRequestConfig(async ({ locale }) => {
-  const resolvedLocale = locale ?? 'fa'; // جلوگیری از undefined بودن
+  const resolvedLocale = locale ?? 'fa';
 
   return {
     locale: resolvedLocale,
