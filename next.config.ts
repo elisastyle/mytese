@@ -1,8 +1,7 @@
-import path from 'path';
 import withNextIntl from 'next-intl/plugin';
 
-const withIntl = withNextIntl(path.resolve(__dirname, 'src/i18n/request'));
+const withIntl = withNextIntl('src/i18n/request'); // بدون dot یا slash اول
 
 export default withIntl({
-  reactStrictMode: true,
+  reactStrictMode: true
 });
